@@ -20,9 +20,9 @@ When writing or modifying test files.
 - Naming: it(should [expected behavior] when [condition])
 - Each function gets minimum 3 tests:
 
-1.  ﻿Happy path with typical input
-2.  ﻿Error/edge case (null, empty, boundary values)
-3.  ﻿Integration behavior (how it interacts with dependencies)
+1. Happy path with typical input
+2. Error/edge case (null, empty, boundary values)
+3. Integration behavior (how it interacts with dependencies)
 
 - Mock external dependencies with vi.mock()
 - Never mock the function being tested

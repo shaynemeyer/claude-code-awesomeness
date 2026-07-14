@@ -30,8 +30,8 @@ Bad: "John Doe", "test@test.com", "123 Main St"
 Good: "Priya Sharma", "priya.sharma@fastmail.com", "847 Valencia St"
 
 - Prefer early returns over nested if/else chains.
-- ﻿﻿Prefer const assertions and literal types over broad types.
-- ﻿﻿Never generate code that "demonstrates the concept." Generate code that solves the actual problem.
+- Prefer const assertions and literal types over broad types.
+- Never generate code that "demonstrates the concept." Generate code that solves the actual problem.
 
 ## Constraints
 
