@@ -4,18 +4,18 @@ A Claude Code skill that manages the full lifecycle of a feature — from spec t
 
 ## Usage
 
-```
+```bash
 /feature <action> [arguments]
 ```
 
-| Action     | Description                                                |
-| ---------- | ----------------------------------------------------------- |
-| `load`     | Load a feature spec (by filename) or inline description     |
-| `start`    | Begin implementation, create the feature branch              |
-| `review`   | Check goals met, code quality, scope creep, test coverage    |
-| `test`     | Write unit tests for testable server actions/utilities       |
-| `explain`  | Document what changed and why, file by file                  |
-| `complete` | Commit, merge, push, and reset for the next feature           |
+| Action     | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| `load`     | Load a feature spec (by filename) or inline description   |
+| `start`    | Begin implementation, create the feature branch           |
+| `review`   | Check goals met, code quality, scope creep, test coverage |
+| `test`     | Write unit tests for testable server actions/utilities    |
+| `explain`  | Document what changed and why, file by file               |
+| `complete` | Commit, merge, push, and reset for the next feature       |
 
 If no action is provided, the skill explains the available options.
 
