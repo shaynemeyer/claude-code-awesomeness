@@ -1,46 +1,128 @@
-# feature
+# /feature Skill
 
-A Claude Code skill that manages the full lifecycle of a feature — from spec to merge — using a single working file, `context/current-feature.md`, as the source of truth for goals, status, and history.
+Spec-driven feature development workflow. Each feature gets a written spec before code is written, keeping Claude focused on defined goals and making reviews predictable.
 
-## Usage
+---
 
-```bash
-/feature <action> [arguments]
+## Setup
+
+**Required the first time this skill is installed in a project.** Run once to create the `context/` directory structure and seed Claude's context files. No other commands will work until this is done.
+
+```
+/feature setup
 ```
 
-| Action     | Description                                               |
-| ---------- | --------------------------------------------------------- |
-| `load`     | Load a feature spec (by filename) or inline description   |
-| `start`    | Begin implementation, create the feature branch           |
-| `review`   | Check goals met, code quality, scope creep, test coverage |
-| `test`     | Write unit tests for testable server actions/utilities    |
-| `explain`  | Document what changed and why, file by file               |
-| `complete` | Commit, merge, push, and reset for the next feature       |
+Creates:
 
-If no action is provided, the skill explains the available options.
+| File | Purpose |
+|------|---------|
+| `context/project-overview.md` | Auto-generated summary of the project's stack and structure |
+| `context/coding-standards.md` | Code conventions derived from analyzing the actual codebase |
+| `context/ai-interaction.md` | Rules for how Claude should behave in this project |
+| `context/testing-instructions.md` | When and how to write tests (derived from your test setup) |
+| `context/current-feature.md` | Tracks the active feature |
+| `context/README.md` | Explains the context directory to teammates |
+| `context/features/` | Directory where feature spec files are stored |
 
-## Working File
+Also adds a `## Context Files` block to your root `CLAUDE.md` so Claude loads this context automatically on every conversation.
 
-`context/current-feature.md` tracks the active feature and has four sections:
-
-- `# Current Feature` — H1 heading with the feature name when active
-- `## Status` — `Not Started` | `In Progress` | `Complete`
-- `## Goals` — bullet points describing what success looks like
-- `## Notes` — additional context, constraints, or spec details
-- `## History` — completed features, appended over time
+---
 
 ## Workflow
 
-1. **`load`** — Point at a spec file (`context/features/{name}.md` or `context/fixes/{name}.md`) or describe the feature inline. Populates Goals/Notes and sets Status to `Not Started`.
-2. **`start`** — Verifies Goals are populated, sets Status to `In Progress`, creates/checks out a branch named from the H1, then implements the goals one by one.
-3. **`test`** — Identifies server actions/utilities touched by the feature and writes Vitest unit tests for any that lack coverage (happy path + error cases, used judiciously).
-4. **`review`** — Checks goals met/missing, code quality, scope creep, and test coverage; gives a final verdict on readiness to complete.
-5. **`explain`** — Summarizes `git diff main --name-only` file by file (what changed and why) and how the pieces connect.
-6. **`complete`** — Commits, merges the feature branch into `main`, deletes the local (and if pushed, remote) branch, resets `current-feature.md`, appends a summary to `## History`, and pushes `main` once.
+### Check status _(optional)_
 
-## Files
+```
+/feature status
+```
 
-- `SKILL.md` — the skill definition; dispatches to files in `actions/`
-- `actions/` — one file per action (`load.md`, `start.md`, `review.md`, `test.md`, `explain.md`, `complete.md`)
-- `single-file-example.md` — legacy all-in-one version without the `test` action
-- `single-file-with-test.md` — legacy all-in-one version including the `test` action
+Read-only. Reports the active feature and its status, progress across all specs, git state
+(branch, uncommitted/unpushed changes), gate state (lint/tests/migrations), and what to do next.
+
+### 1. Create a spec _(optional)_
+
+```
+/feature <name>
+/feature <name> <description>
+```
+
+Scaffolds a spec file at `context/features/<name>.md`. If a description is provided, Claude pre-populates the spec sections from it. Without a description, sections are left as empty placeholders for you to fill in.
+
+The spec is **not** activated — run `/feature load <name>` when you're ready to start work.
+
+### 2. Load a spec _(required)_
+
+```
+/feature load <name> [description]
+```
+
+Reads the spec and populates `context/current-feature.md` with goals and notes. Sets status to `Not Started`.
+
+- If the spec file exists, it is loaded directly.
+- If it doesn't exist, a description is required to create it first.
+- Omit `<name>` to derive one automatically from the description.
+
+### 3. Start implementation _(required)_
+
+```
+/feature start
+```
+
+Sets status to `In Progress`, creates and checks out a feature branch, then implements the goals from `current-feature.md` one by one.
+
+To specify the branch name:
+
+```
+/feature start my-branch-name
+```
+
+### 4. Review progress _(optional)_
+
+```
+/feature review
+```
+
+Audits all changes against the goals in `current-feature.md`. Reports on goals met, missing, code quality issues, scope creep, and test coverage. Returns a verdict: ready to complete or needs changes.
+
+### 5. Explain changes _(optional)_
+
+```
+/feature explain
+```
+
+Lists every file created or modified, with a 1–2 sentence explanation of what changed and why. Ends with a summary of how the pieces fit together — useful for writing a PR description or onboarding a reviewer.
+
+### 6. Write tests _(optional)_
+
+```
+/feature test
+```
+
+Reviews what was implemented and writes tests following the project's testing conventions from `context/testing-instructions.md`.
+
+### 7. Complete the feature _(required)_
+
+```
+/feature complete
+```
+
+Stages and commits all changes, resets `current-feature.md` for the next feature, and appends a summary to the history log. Prompts you to open a Merge Request.
+
+---
+
+## Command Reference
+
+`<required>` `[optional]`
+
+| Command | What it does |
+|---------|-------------|
+| `/feature setup` | **Run first.** Initialize context files in the project |
+| `/feature status` | _(optional)_ Report active feature, progress, git and gate state |
+| `/feature <name> [description]` | _(optional)_ Create a spec (optionally pre-populated from description) |
+| `/feature load <name> [description]` | **Required.** Load a spec, creating it from description if it doesn't exist. Omit `<name>` to derive one from the description. |
+| `/feature start [branch]` | **Required.** Branch and implement the active feature |
+| `/feature review` | _(optional)_ Audit changes against goals |
+| `/feature explain` | _(optional)_ Summarize files changed and how they connect |
+| `/feature test` | _(optional)_ Write tests for the implemented feature |
+| `/feature complete` | **Required.** Commit, reset, and prompt for MR |
+| `/feature help` | _(optional)_ Show all commands |
